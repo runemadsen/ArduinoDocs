@@ -1,0 +1,41 @@
+<html>
+
+	<head>
+		
+		<title>Video Test</title>
+		<link rel="stylesheet" href="screen.css" type="text/css" />
+    <script type="text/javascript" src="jquery.js"></script>
+     
+		<script>
+		
+		function pauseVideo(){
+		  $("#videotag")[0].pause();
+		}
+		
+		function playVideo(){
+		  $("#videotag")[0].play();
+		}
+		
+		function videoIsReady(){
+		  return $("#videotag")[0].readyState == 4;
+		}
+		
+		function goToTime(time){
+		  $("#videotag")[0].currentTime = time;
+		}
+ 
+		</script>
+		<script src="processing-0.9.1.min.js"></script>
+
+	</head>
+	
+	<body>
+		<video id="videotag" class="hvideo" src="media/roll.mov" width="848" height="480">
+			your browser does not support the video tag
+		</video>
+		
+		<canvas id="canvastag" datasrc="processing.js" width="848" height="480"></canvas>
+		
+	</body>
+
+</html>
