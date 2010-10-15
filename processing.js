@@ -1,3 +1,7 @@
+/*@pjs
+isTransparent=true
+*/
+
 var polygon = {};
 var e = {};
 var allowDraw = true;
@@ -14,12 +18,13 @@ void setup()
 	polygon.lineColor = color(255, 0, 0);
 	polygon.points = [];
 	
-	p = createGraphics(848, 480, P3D);
+	p = createGraphics(848, 480);
 }
 
 void draw() 
 {		
-	clearBG();
+	background(255, 255, 0, 0);
+	p.background(0, 0);
 	p.beginDraw();
 	
 	for(int i = 0; i < polygon.points.length; i++)
@@ -47,13 +52,11 @@ void draw()
 		p.ellipse(e.x, e.y, e.w, e.h);
 		p.ellipseMode(CORNER);
 		
-		//mouseX / wid
-		
 		pos = calculatePointOnEllipse(map(mouseX, 0, width, 0, -(2 * PI)));
 		
-		fill(255, 255, 255);
-		
-		rect(e.x + pos.x, e.y + pos.y, 50, 15);
+		p.stroke(0, 0, 0);
+		p.fill(255, 255, 255);
+		p.rect(e.x + pos.x, e.y + pos.y, 50, 15);
 
 		if(videoIsReady())
 		{
@@ -67,19 +70,14 @@ void draw()
 	image(p, 0, 0);
 }
 
-void calculatePointOnEllipse(deg)
+function calculatePointOnEllipse(deg)
 {
 	int xPos = (e.w / 2) * cos(deg);
 	int yPos = (e.h / 2) * sin(deg);
 	
-	return {x:xPos, y:yPos};
-}
-
-void clearBG()
-{
-	p.loadPixels();
-	for(int i = 0; i < width * height; i++) p.pixels[i] = 0;
-	p.updatePixels();
+	var returnObject = {x:xPos, y:yPos};
+	
+	return returnObject;
 }
 
 void mousePressed()
