@@ -147,6 +147,8 @@ void mousePressed()
 	if(allowDraw)
 	{
 		polygon.points.push( {x:mouseX, y:mouseY} );
+		
+		goToTime($("#videotag")[0].currentTime + 0.5);
 	}
 	
 }
@@ -189,7 +191,9 @@ void keyPressed()
 	}
 	else if(key == 't')
 	{
-		if(toggle)
+		
+		
+		/*if(toggle)
 		{	
 			playVideo();
 		}
@@ -198,6 +202,8 @@ void keyPressed()
 			pauseVideo();
 		}
 
-		toggle = !toggle;
+		toggle = !toggle;*/
+		
+		
 	}
 }
