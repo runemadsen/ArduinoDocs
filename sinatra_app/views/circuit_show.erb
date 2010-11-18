@@ -1,5 +1,47 @@
-<script>
-  var circuit = <%= @circuit.to_json %>;
-</script>
-<h2>Circuit <%= @circuit.id %></h2>
-<p>Video URL: <%= @circuit.video_url %></p>
+<html>
+
+	<head>
+		
+		<title>Video Test</title>
+		<link rel="stylesheet" href="/screen.css" type="text/css" />
+    <script type="text/javascript" src="/jquery.js"></script>
+     
+		<script>
+		
+		function pauseVideo(){
+		  $("#videotag")[0].pause();
+		}
+		
+		function playVideo(){
+		  $("#videotag")[0].play();
+		}
+		
+		function videoIsReady(){
+		  return $("#videotag")[0].readyState == 4;
+		}
+		
+		function goToTime(time){
+		  $("#videotag")[0].currentTime = time;
+		}
+ 
+		</script>
+		<script src="/processing-0.9.7.min.js"></script>
+
+	</head>
+	
+	<body>
+		<script>
+		  var circuit = <%= @circuit.to_json %>;
+		</script>
+		<h2>Circuit <%= @circuit.id %></h2>
+		<p>Video URL: <%= @circuit.video_url %></p>
+		
+		<video id="videotag" class="hvideo" src="<%= @circuit.video_url %>" width="640" height="480">
+			your browser does not support the video tag
+		</video>
+		
+		<canvas id="canvastag" datasrc="/processing.js" width="640" height="480"></canvas>
+		
+	</body>
+
+</html>

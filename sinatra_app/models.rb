@@ -1,8 +1,8 @@
 require 'dm-core'
 
 #DataMapper.setup(:default, 'sqlite::memory:')
-# DataMapper.setup(:default, 'sqlite:////Users/greg/code/sinatra/sqlite3.db')
-DataMapper.setup(:default, ENV['DATABASE_URL'] || 'mysql://localhost/arduino_docs')
+ DataMapper.setup(:default, 'sqlite:///Users/Rune/Projects/ArduinoDocs/Repositories/ArduinoDocs/sinatra_app/sqlite3.db')
+#DataMapper.setup(:default, ENV['DATABASE_URL'] || 'mysql://localhost/arduino_docs')
 
 class Circuit
   include DataMapper::Resource   
@@ -30,6 +30,16 @@ class Component
   belongs_to :circuit
   has n, :points
   
+  def self.create_with_points!(opts)
+    circuit = Circuit.get opts[:circuit_id]
+    component = circuit.components.create! :name => opts[:name]
+    opts[:points].each_with_index do |p, i|
+      component.points.create!( p.merge( :order => i) ) 
+    end
+    component
+  end
+  
+  
   def to_json
     <<-JSON
     {"name" : "#{self.name}",
@@ -45,7 +55,7 @@ class Point
   property :id,           Serial
   property :x, Integer
   property :y, Integer
-  property :position, Integer
+  property :order, Integer
 
   belongs_to :component
   

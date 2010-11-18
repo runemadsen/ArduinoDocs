@@ -9,6 +9,10 @@ get "/circuits" do
   erb :circuits_index
 end
 
+post "/components" do
+  @component = Component.create_with_points! params[:component]
+end
+
 get "/circuits/:id" do
   @circuit = Circuit.get params[:id]
   erb :circuit_show
