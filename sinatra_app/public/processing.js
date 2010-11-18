@@ -16,7 +16,13 @@ void setup()
 	noFill();
 	
 	polygon.lineColor = color(255, 0, 0);
-	polygon.points = [];
+	polygon.points = circuit.components[0].points;
+	//polygon.points = circuit.points;
+	
+	console.log(polygon.points);
+	
+	allowDraw = false;	
+	scrubMode = true;
 	
 	p = createGraphics(848, 480);
 }

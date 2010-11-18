@@ -8,6 +8,8 @@
      
 		<script>
 		
+		var circuit = <%= @circuit.to_json %>;
+		
 		function pauseVideo(){
 		  $("#videotag")[0].pause();
 		}
@@ -30,9 +32,6 @@
 	</head>
 	
 	<body>
-		<script>
-		  var circuit = <%= @circuit.to_json %>;
-		</script>
 		<h2>Circuit <%= @circuit.id %></h2>
 		<p>Video URL: <%= @circuit.video_url %></p>
 		
