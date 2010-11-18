@@ -15,6 +15,7 @@ class Circuit
   def to_json
     <<-JSON
     {
+      "id" : #{self.id},
       "components" : [#{self.components.collect{|c| c.to_json}.join(",")}]
     }
     JSON
@@ -43,7 +44,7 @@ class Component
   def to_json
     <<-JSON
     {"name" : "#{self.name}",
-     "points" : [#{self.points.sort_by{|a| a.position }.collect{|p| p.to_json}.join(",")}]
+     "points" : [#{self.points.sort_by{|a| a.order }.collect{|p| p.to_json}.join(",")}]
     }
     JSON
   end

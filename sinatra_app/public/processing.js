@@ -66,8 +66,7 @@ void draw()
 
 function getLoopLength()
 {
-	//return polygon.points.length * 0.5;
-	return polygon.points[polygon.points.length - 1].t + 0.5;
+	return polygon.points.length * 0.5;
 }
 
 void drawCurves()
@@ -182,7 +181,7 @@ void mousePressed()
 {
 	if(allowDraw)
 	{
-		polygon.points.push( {x:mouseX, y:mouseY, t:$("#videotag")[0].currentTime});
+		polygon.points.push( {x:mouseX, y:mouseY} );
 		
 		//console.log("Current time: " + $("#videotag")[0].currentTime);
 		
@@ -195,6 +194,25 @@ void keyPressed()
 {
 	if(key == 'c')
 	{
+		var request = {
+			"points" : polygon.points,
+			"circuit_id" : circuit.id,
+			"name" : "test"
+		};
+
+
+		console.log("hj");
+		console.log(request);
+		request.name = "test circuit";
+		
+		//{:points=>[{:y=>5, :x=>10}, {:y=>20, :x=>12}], :circuit_id=>1, :name=>"resistor"}
+		$.ajax({
+		  type: 'POST',
+		  url: '/components',
+		  data: request,
+		  success: function() { alert("Success"); }
+		});
+		
 		allowDraw = false;
 		
 		//calcEllipse();
