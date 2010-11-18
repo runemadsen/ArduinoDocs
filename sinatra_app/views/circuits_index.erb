@@ -1,0 +1,6 @@
+<h2>All circuits</h2>
+<ul>
+<% for circuit in @circuits %>
+<li><a href="/circuits/<%= @circuit.id %>">Video URL: <%= circuit.video_url %></a></li>
+<% end %>
+</ul>
