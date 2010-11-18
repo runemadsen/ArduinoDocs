@@ -11,7 +11,7 @@ PGraphics p;
 
 void setup() 
 {	
-	size(848, 480);
+	size(640, 480);
 	smooth();
 	noFill();
 	
@@ -37,7 +37,7 @@ void draw()
 
 		if(videoIsReady())
 		{
-			targetTime = map(mouseX, 0, screen.width, 0, $("#videotag")[0].duration);
+			targetTime = map(mouseX, 0, width, 0, getLoopLength());//$("#videotag")[0].duration);
 			goToTime(targetTime);
 		}
 	}
@@ -62,6 +62,12 @@ void draw()
 	p.endDraw();
 	
 	image(p, 0, 0);
+}
+
+function getLoopLength()
+{
+	//return polygon.points.length * 0.5;
+	return polygon.points[polygon.points.length - 1].t + 0.5;
 }
 
 void drawCurves()
@@ -104,24 +110,30 @@ void drawLabel()
 	parts = reading.toString().split(".");
 	
 	bottomPoint = parseInt(parts[0]);
+	
 	t = reading - bottomPoint;
 	
 	pointsToUse = [];
 	
-	for(int i = bottomPoint - 2; i < bottomPoint + 2; i++ ){
+	for(int i = bottomPoint - 1; i < bottomPoint + 3; i++ )
+	{
 		if(i < 0)
 		{
 			// -1 == length -1
 			// -2 -- length -2
 			pointsToUse.push(polygon.points[polygon.points.length + i]);
-		} else if (i > polygon.points.length - 1){
-		  pointsToUse.push(polygon.points[i - polygon.points.length]);
+		} 
+		else if (i > polygon.points.length - 1)
+		{
+		  	pointsToUse.push(polygon.points[i - polygon.points.length]);
 		}
-		
-		else{
+		else
+		{
 			pointsToUse.push(polygon.points[i]);
 		}
 	}
+	
+	console.log(pointsToUse.length);
 
 	coords = getScreenPositionOfSpline(t, pointsToUse[0].x, pointsToUse[0].y, pointsToUse[1].x, pointsToUse[1].y, pointsToUse[2].x, pointsToUse[2].y, pointsToUse[3].x, pointsToUse[3].y);
 	
@@ -140,17 +152,6 @@ function calculatePointOnEllipse(deg)
 	var returnObject = {x:xPos, y:yPos};
 	
 	return returnObject;
-}
-
-void mousePressed()
-{
-	if(allowDraw)
-	{
-		polygon.points.push( {x:mouseX, y:mouseY} );
-		
-		goToTime($("#videotag")[0].currentTime + 0.5);
-	}
-	
 }
 
 void calcEllipse()
@@ -177,7 +178,18 @@ function getScreenPositionOfSpline(t , p0x , p0y , p1x , p1y , p2x , p2y , p3x ,
   return [x,y];
 }
 
-
+void mousePressed()
+{
+	if(allowDraw)
+	{
+		polygon.points.push( {x:mouseX, y:mouseY, t:$("#videotag")[0].currentTime});
+		
+		//console.log("Current time: " + $("#videotag")[0].currentTime);
+		
+		goToTime($("#videotag")[0].currentTime + 0.5);
+	}
+	
+}
 
 void keyPressed()
 {
