@@ -2,12 +2,17 @@
 isTransparent=true
 */
 
+/* Properties
+________________________________________________________ */
+
+var components = [];
 var polygon = {};
 var e = {};
-var allowDraw = true;
 var toggle = false;
-var scrubMode = false;
 PGraphics p;
+
+/* Setup
+________________________________________________________ */
 
 void setup() 
 {	
@@ -15,17 +20,16 @@ void setup()
 	smooth();
 	noFill();
 	
+	components = circuit.components;
+	
 	polygon.lineColor = color(255, 0, 0);
-	polygon.points = circuit.components[0].points;
-	//polygon.points = circuit.points;
-	
-	console.log(polygon.points);
-	
-	allowDraw = false;	
-	scrubMode = true;
+	polygon.points = [];
 	
 	p = createGraphics(848, 480);
 }
+
+/* Draw
+________________________________________________________ */
 
 void draw() 
 {		
@@ -33,22 +37,23 @@ void draw()
 	p.background(0, 0);
 	p.beginDraw();
 	
-	if(scrubMode)
+	if(app.mode == "scrub" && components.length > 0 || app.newComponent)
 	{
-		// drawEllipse();
+		setComponent()
 		
-		drawCurves();
+		//drawComponents();
 		
-		drawLabel();
+		drawLabels();
 
 		if(videoIsReady())
 		{
-			targetTime = map(mouseX, 0, width, 0, getLoopLength());//$("#videotag")[0].duration);
+			targetTime = map(mouseX, 0, width, 0, getLoopLength());
 			goToTime(targetTime);
 		}
 	}
-	else
+	else if(app.mode == "draw")
 	{
+		
 		for(int i = 0; i < polygon.points.length; i++)
 		{		
 			p.fill(polygon.lineColor);
@@ -72,28 +77,42 @@ void draw()
 
 function getLoopLength()
 {
-	return polygon.points.length * 0.5;
+	return components[0].points.length * 0.5;
 }
 
-void drawCurves()
+/* Draw Components
+________________________________________________________ */
+
+void drawComponents()
 {	
+	for(int i = 0; i < components.length; i++)
+	{
+		drawComponent(components[i]);
+	}
+}
+
+void drawComponent(c)
+{
 	p.noFill();
 	
 	p.beginShape();
 	
-	for(int i = 0; i < polygon.points.length; i++)
+	for(int i = 0; i < c.points.length; i++)
 	{
-		p.curveVertex(polygon.points[i].x, polygon.points[i].y);
+		p.curveVertex(c.points[i].x,c.points[i].y);
 	}
 	
 	// close shape
-	for(int i = 0; i < polygon.points.length - 1; i++)
+	for(int i = 0; i < c.points.length - 1; i++)
 	{
-		p.curveVertex(polygon.points[i].x, polygon.points[i].y);
+		p.curveVertex(c.points[i].x, c.points[i].y);
 	}
 	
 	p.endShape();
 }
+
+/* Draw
+________________________________________________________ */
 
 void drawEllipse()
 {
@@ -106,11 +125,17 @@ void drawEllipse()
 	p.ellipseMode(CORNER);
 }
 
-void drawLabel()
+void drawLabels()
 {
-	//pos = calculatePointOnEllipse(map(mouseX, 0, width, 0, -(2 * PI)));
+	for(int i = 0; i < components.length; i++)
+	{
+		drawLabel(components[i]);
+	}
+}
 
-	reading = map(mouseX, 0, width, 0, polygon.points.length);
+void drawLabel(c)
+{
+	reading = map(mouseX, 0, width, 0, c.points.length);
 	
 	parts = reading.toString().split(".");
 	
@@ -126,19 +151,19 @@ void drawLabel()
 		{
 			// -1 == length -1
 			// -2 -- length -2
-			pointsToUse.push(polygon.points[polygon.points.length + i]);
+			pointsToUse.push(c.points[c.points.length + i]);
 		} 
-		else if (i > polygon.points.length - 1)
+		else if (i > c.points.length - 1)
 		{
-		  	pointsToUse.push(polygon.points[i - polygon.points.length]);
+		  	pointsToUse.push(c.points[i - c.points.length]);
 		}
 		else
 		{
-			pointsToUse.push(polygon.points[i]);
+			pointsToUse.push(c.points[i]);
 		}
 	}
 	
-	console.log(pointsToUse.length);
+	//console.log(pointsToUse.length);
 
 	coords = getScreenPositionOfSpline(t, pointsToUse[0].x, pointsToUse[0].y, pointsToUse[1].x, pointsToUse[1].y, pointsToUse[2].x, pointsToUse[2].y, pointsToUse[3].x, pointsToUse[3].y);
 	
@@ -185,11 +210,9 @@ function getScreenPositionOfSpline(t , p0x , p0y , p1x , p1y , p2x , p2y , p3x ,
 
 void mousePressed()
 {
-	if(allowDraw)
+	if(app.mode == "draw")
 	{
-		polygon.points.push( {x:mouseX, y:mouseY} );
-		
-		//console.log("Current time: " + $("#videotag")[0].currentTime);
+		polygon.points.push( {x:mouseX, y:mouseY});
 		
 		goToTime($("#videotag")[0].currentTime + 0.5);
 	}
@@ -198,48 +221,46 @@ void mousePressed()
 
 void keyPressed()
 {
-	if(key == 'c')
+	if(key == 'c' && app.mode == "draw")
 	{
 		var request = {
 			"points" : polygon.points,
 			"circuit_id" : circuit.id,
 			"name" : "test"
 		};
-
-
-		console.log("hj");
-		console.log(request);
-		request.name = "test circuit";
 		
-		//{:points=>[{:y=>5, :x=>10}, {:y=>20, :x=>12}], :circuit_id=>1, :name=>"resistor"}
+	
+		request.name = "test circuit";
+	
 		$.ajax({
-		  type: 'POST',
-		  url: '/components',
-		  data: request,
-		  success: function() { alert("Success"); }
+			type: 'POST',
+		  	url: '/components',
+		  	data: request,
+			dataType: "json",
+		  	success: function(data) 
+			{ 
+				polygon.points = [];
+				app.newComponent = data;
+				//components.push( data  )
+				//setComponent();
+				app.mode = "scrub";
+			}
 		});
 		
-		allowDraw = false;
 		
-		//calcEllipse();
-		
-		scrubMode = true;
 	}
-	else if(key == 't')
-	{
-		
-		
-		/*if(toggle)
-		{	
-			playVideo();
-		}
-		else
-		{
-			pauseVideo();
-		}
+}
 
-		toggle = !toggle;*/
-		
+void setComponent()
+{
+	if(app.newComponent)
+	{
+		console.log(app.newComponent)
+		components.push(app.newComponent);
+		app.newComponent = false;
+		console.log(components);
 		
 	}
+	
+//	console.log(components);
 }

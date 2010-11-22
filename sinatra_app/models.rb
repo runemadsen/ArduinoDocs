@@ -34,8 +34,8 @@ class Component
   def self.create_with_points!(opts)
     circuit = Circuit.get opts[:circuit_id]
     component = circuit.components.create! :name => opts[:name]
-    opts[:points].each_with_index do |p, i|
-      component.points.create!( p.merge( :order => i) ) 
+    opts[:points].each do |p|
+      component.points.create!( p) 
     end
     component
   end

@@ -9,6 +9,10 @@
 		<script>
 		
 		var circuit = <%= @circuit.to_json %>;
+		var app = {
+			mode : "scrub"
+		};
+		
 		
 		function pauseVideo(){
 		  $("#videotag")[0].pause();
@@ -35,6 +39,13 @@
 			
 			$("#controls :text").change(function(){
 				console.log($(this).attr("id") + $(this).attr("value"));
+			});
+			
+		 	$('#addcomponent').click(function()
+			{
+				app.mode = "draw";
+				goToTime(0);
+				return false;
 			});
 		});
 		
@@ -68,6 +79,7 @@
 				</li>
 			<% end %>
 			</ul>
+			<a href="#" id="addcomponent">Add new component</a>
 		</div>
 		
 	</body>
